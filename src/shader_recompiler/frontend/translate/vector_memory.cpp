@@ -327,7 +327,7 @@ void Translator::BUFFER_LOAD_FORMAT(u32 num_dwords, bool is_typed, bool is_forma
         }
         return {};
     }();
-    const IR::Value soffset{GetSrc(inst.src[3])};
+    const IR::U32 soffset{GetSrc<IR::U32>(inst.src[3])};
     ASSERT_MSG(soffset.IsImmediate() && soffset.U32() == 0, "Non immediate offset not supported");
 
     IR::BufferInstInfo info{};
