@@ -350,9 +350,16 @@ vk::ShaderModule PipelineCache::CompileModule(Shader::Info& info,
     }
 
     const auto ir_program = Shader::TranslateProgram(code, pools, info, runtime_info, profile);
-    const auto spv = Shader::Backend::SPIRV::EmitSPIRV(profile, runtime_info, ir_program, binding);
+    auto spv = Shader::Backend::SPIRV::EmitSPIRV(profile, runtime_info, ir_program, binding);
     if (Config::dumpShaders()) {
         DumpShader(spv, info.pgm_hash, info.stage, perm_idx, "spv");
+    }
+    if (Config::patchShaders()) {
+        auto patch = GetShaderPatch(info.pgm_hash, info.stage, perm_idx, "spv");
+        if (patch) {
+            spv = *patch;
+            LOG_INFO(Loader, "Loaded patch for {} shader {:#x}", info.stage, info.pgm_hash);
+        }
     }
 
     const auto module = CompileSPV(spv, instance.GetDevice());
@@ -404,6 +411,25 @@ void PipelineCache::DumpShader(std::span<const u32> code, u64 hash, Shader::Stag
     const auto filename = fmt::format("{}_{:#018x}_{}.{}", stage, hash, perm_idx, ext);
     const auto file = IOFile{dump_dir / filename, FileAccessMode::Write};
     file.WriteSpan(code);
+}
+
+std::optional<std::vector<u32>> PipelineCache::GetShaderPatch(u64 hash, Shader::Stage stage,
+                                                              size_t perm_idx,
+                                                              std::string_view ext) {
+    using namespace Common::FS;
+    const auto patch_dir = GetUserPath(PathType::ShaderDir) / "patch";
+    if (!std::filesystem::exists(patch_dir)) {
+        std::filesystem::create_directories(patch_dir);
+    }
+    const auto filename = fmt::format("{}_{:#018x}_{}.{}", stage, hash, perm_idx, ext);
+    const auto filepath = patch_dir / filename;
+    if (!std::filesystem::exists(filepath)) {
+        return {};
+    }
+    const auto file = IOFile{patch_dir / filename, FileAccessMode::Read};
+    std::vector<u32> code(file.GetSize() / sizeof(u32));
+    file.Read(code);
+    return code;
 }
 
 } // namespace Vulkan
