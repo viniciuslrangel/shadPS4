@@ -340,6 +340,8 @@ set(MISC_LIBS  src/core/libraries/screenshot/screenshot.cpp
 
 set(DEV_TOOLS src/core/devtools/layer.cpp
               src/core/devtools/layer.h
+              src/core/devtools/options.cpp
+              src/core/devtools/options.h
               src/core/devtools/gcn/gcn_context_regs.cpp
               src/core/devtools/gcn/gcn_op_names.cpp
               src/core/devtools/gcn/gcn_shader_regs.cpp
@@ -349,6 +351,12 @@ set(DEV_TOOLS src/core/devtools/layer.cpp
               src/core/devtools/widget/frame_dump.h
               src/core/devtools/widget/frame_graph.cpp
               src/core/devtools/widget/frame_graph.h
+              src/core/devtools/widget/imgui_memory_editor.h
+              src/core/devtools/widget/reg_view.cpp
+              src/core/devtools/widget/reg_view.h
+              src/core/devtools/widget/text_editor.cpp
+              src/core/devtools/widget/text_editor.h
+              src/core/devtools/widget/types.h
 )
 
 set(COMMON src/common/logging/backend.cpp
