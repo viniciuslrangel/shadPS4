@@ -357,6 +357,7 @@ void Emulator::Restart(std::filesystem::path eboot_path,
                        const std::vector<std::string>& guest_args) {
     std::vector<std::string> args;
 
+    args.push_back("--log-append");
     args.push_back("--game");
     args.push_back(Common::FS::PathToUTF8String(eboot_path));
 
@@ -377,6 +378,7 @@ void Emulator::Restart(std::filesystem::path eboot_path,
     }
 
     LOG_INFO(Common, "Restarting the emulator with args: {}", fmt::join(args, " "));
+    Common::Log::Denitializer();
 
 #ifdef _WIN32
     std::string cmdline;
